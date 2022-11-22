@@ -1,0 +1,28 @@
+[package]
+name = "my-project"
+version = "0.1.0"
+authors = ["runner"]
+edition = "2021"
+default-run = "play"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[lib]
+name = "tictactoe"
+path = "src/lib.rs"
+
+[[bin]]
+name = "simulate"
+path = "src/bin/simulate.rs"
+test = false
+
+[[bin]]
+name = "play"
+path = "src/bin/play.rs"
+test = false
+
+[dependencies]
+rand = "0.8"
+
+[dev-dependencies]
+assert_matches = "1.5"
