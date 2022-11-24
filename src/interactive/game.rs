@@ -1,4 +1,4 @@
-use crate::board::{Board, Mark, Position, Status, player_name};
+use crate::board::{SIDE_SIZE, Board, Mark, Position, Status, player_name};
 use crate::interactive::input::{Command, UserInput};
 
 pub struct Game {
@@ -60,10 +60,12 @@ impl Game {
     }
 
     fn valid_turn(&self, pos: &Position) -> Result<(), String> { 
-        if self.board.empty(&pos) {
-            Ok(())
-        } else {
+        if pos.0 >= SIDE_SIZE || pos.1 >= SIDE_SIZE {
+            Err(String::from(format!("each coordinate should be < {}", SIDE_SIZE)))
+        } else if !self.board.empty(&pos) {
             Err(String::from("cell is not empty"))
+        } else {
+            Ok(())
         }
     }
 
