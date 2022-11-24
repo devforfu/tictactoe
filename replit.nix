@@ -1,6 +1,7 @@
 { pkgs }: {
 	deps = [
-		pkgs.vimHugeX
+		pkgs.tree
+  pkgs.vimHugeX
   pkgs.rustc
 		pkgs.rustfmt
 		pkgs.cargo

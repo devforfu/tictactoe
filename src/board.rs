@@ -51,6 +51,8 @@ impl Board {
         }
     }
 
+    pub fn empty(&self, pos: &Position) -> bool { self[*pos] == Mark::Empty }
+
     pub fn impossible(&self) -> bool {
         let (fst, snd) = self.0.iter().fold((0i8, 0i8), |acc, val| {
             let (i, j) = match val {
