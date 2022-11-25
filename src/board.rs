@@ -22,6 +22,7 @@ pub enum Status {
     Impossible,
 }
 
+#[derive(Copy, Clone)]
 pub struct Board([Mark; BOARD_SIZE]);
 
 impl Board {
@@ -161,6 +162,30 @@ impl IndexMut<Position> for Board {
     }
 }
 
+pub struct BoardIterator<'a> {
+    board: &'a Board,
+    current: usize,
+}
+
+impl<'a> BoardIterator<'a> {
+    pub fn new(board: &'a Board) -> Self { Self {board, current: 0}}
+}
+
+impl<'a> Iterator for BoardIterator<'a> {
+    type Item = (Position, Mark);
+
+    fn next(&mut self) -> Option<Self::Item> {
+        if self.current >= BOARD_SIZE {
+            None
+        } else {
+            let pos = (self.current / SIDE_SIZE, self.current % SIDE_SIZE);
+            let mark = self.board[pos];
+            self.current += 1;
+            Some((pos, mark))
+        }
+    }
+}
+
 fn check_bounds(pos: Position) -> Position {
     if pos.0 >= SIDE_SIZE || pos.1 >= SIDE_SIZE { 
         panic!("wrong board index: {:#?}", pos);
@@ -235,5 +260,26 @@ mod tests {
         let board = Board::try_from("xxx|xxx|xxx").unwrap();
 
         assert_eq!(board.status(), Status::Impossible);
+    }
+
+    #[test]
+    fn test_board_iterator() {
+        let mut board = Board::new();
+        board[(0, 0)] = Mark::First;
+        board[(1, 1)] = Mark::Second;
+        board[(2, 2)] = Mark::First;
+
+        let mut iter = BoardIterator::new(&board);
+
+        assert_eq!(iter.next(), Some(((0, 0), Mark::First)));
+        assert_eq!(iter.next(), Some(((0, 1), Mark::Empty)));
+        assert_eq!(iter.next(), Some(((0, 2), Mark::Empty)));
+        assert_eq!(iter.next(), Some(((1, 0), Mark::Empty)));
+        assert_eq!(iter.next(), Some(((1, 1), Mark::Second)));
+        assert_eq!(iter.next(), Some(((1, 2), Mark::Empty)));
+        assert_eq!(iter.next(), Some(((2, 0), Mark::Empty)));
+        assert_eq!(iter.next(), Some(((2, 1), Mark::Empty)));
+        assert_eq!(iter.next(), Some(((2, 2), Mark::First)));
+        assert_eq!(iter.next(), None);
     }
 }
