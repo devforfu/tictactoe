@@ -1,5 +1,6 @@
 use crate::board::{SIDE_SIZE, Board, BoardIterator, Mark, Position, Status, player_name};
 use crate::interactive::input::{Command, UserInput};
+use crate::render::{Message, Render};
 
 pub struct Game {
     board: Board,
@@ -23,25 +24,19 @@ impl Game {
         positions
     }
 
-    pub fn play(&mut self, input: &mut dyn UserInput) {
-        println!("Welcome to the Tic-Tac-Toe game!\n\
-                 Commands:\n\
-                 (1) put mark at x row and y column: x,y\n\
-                 (2) stop the game: [s]top (or Ctrl-C)\n");
-
-        println!("{}", self.board);
+    pub fn play(&mut self, input: &mut dyn UserInput, output: &dyn Render) {
+        output.draw(Message::Welcome);
+        output.draw(Message::BoardState(&self.board));
         
         while self.ongoing() {
             if let Some(cmd) = input.read() {
                self.turn(&cmd);
             } else {
-                println!("Unknown command, try again!");
+                output.draw(Message::UnknownCommand);
             }
         }
 
-        println!("The game is over: {}\n\
-                 The final board's state:\n{}", 
-                 self.status_string(), self.board);
+        output.draw(Message::GameOver(&self.board, self.status_string()));
     }
     
     fn turn(&mut self, cmd: &Command) {
